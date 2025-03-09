@@ -14,7 +14,6 @@ public class StackSort {
 
         int data[] = null;
         int result[] = null;
-
         Scanner input;
         input = new Scanner(System.in);
 
@@ -77,8 +76,16 @@ public class StackSort {
      * @return     An array of sorted integers. 
      */
     private static int[] doStackSort(int data[]) {
+        VectorStack<Integer> lowerValues = new VectorStack<Integer>();
+        VectorStack<Integer> upperValues = new VectorStack<Integer>();
+        int result[] = new int[data.length];
+        for(int i : data){
+            upperValues.push(i);
+        }
+        for(int i = 0; i < result.length; i++){
+            result[i] = upperValues.pop();
+        }
 
-    int result[] = new int[data.length];
 
         
     // ADD CODE HERE TO SORT THE ARRAY USING TWO STACKS
