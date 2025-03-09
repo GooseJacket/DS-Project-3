@@ -79,8 +79,18 @@ public class StackSort {
         VectorStack<Integer> lowerValues = new VectorStack<Integer>();
         VectorStack<Integer> upperValues = new VectorStack<Integer>();
         int result[] = new int[data.length];
-        for(int i : data){
-            upperValues.push(i);
+        for(int value : data){
+            while(!upperValues.isEmpty() && upperValues.peek() < value){
+                lowerValues.push(upperValues.pop());
+            }
+            while(!lowerValues.isEmpty() && lowerValues.peek() > value){
+                upperValues.push(lowerValues.pop());
+            }
+            upperValues.push(value);
+            //put it here
+        }
+        while(!lowerValues.isEmpty()){
+            upperValues.push(lowerValues.pop());
         }
         for(int i = 0; i < result.length; i++){
             result[i] = upperValues.pop();
