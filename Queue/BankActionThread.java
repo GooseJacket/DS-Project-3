@@ -84,10 +84,12 @@ public class BankActionThread extends ActionThread
             SimulationEvent se = theEvents.remove();
             se.process();
             lastEventReport = se.getPostActionReport();
+            if(!theEvents.isEmpty()) {
+                nextEventAction = theEvents.peek().getDescription();
+            }
             myReport.updateTime(se.getTime());
             animationPause();
         }
-        //ADD CODE HERE TO RUN THE EVENT SIMULATION
     }
     
 
