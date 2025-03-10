@@ -80,7 +80,7 @@ public class BankActionThread extends ActionThread
 
     public void executeApplication()
     {
-        while(!theEvents.isEmpty()){
+        while(!theEvents.isEmpty() && stopSimulationAt > theEvents.getCurrentTime()){
             SimulationEvent se = theEvents.remove();
             se.process();
             lastEventReport = se.getPostActionReport();
