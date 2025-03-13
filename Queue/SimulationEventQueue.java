@@ -43,13 +43,26 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 		if(isEmpty()) {
 			startNode = new EventNode(newEntry);
 			numNodes = 1;
-			lastTime = startNode.data.getTime();
+			System.out.println(this.print("DEBUGGING ADD: isE"));
 		}else{
-			EventNode added = new EventNode(newEntry);
-			EventNode e = startNode;
-			while(e.next != null){e = e.next;}
-			e.next = added;
-			numNodes++;
+			double net = newEntry.getTime();
+			if(net >= lastTime) {
+				EventNode added = new EventNode(newEntry);
+				EventNode before = null;
+				EventNode after = startNode;
+				while (after != null && net > after.data.getTime()) {
+					before = after;
+					after = after.next;
+				}
+				added.next = after;
+				if(before != null){//avoid NullPointer
+					before.next = added;
+				}
+				numNodes++;
+				System.out.println(this.print("DEBUGGING ADD: net>lt and !isE"));
+			}else{
+				System.out.println(this.print("DEBUGGING ADD: net<lt and !isE"));
+			}
 		}
     }
 
@@ -112,6 +125,16 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 	public double getCurrentTime(){
 	    return lastTime;
     }
+
+    private String print(String desc){
+		String ret = desc + " ";
+		EventNode e = startNode;
+		while(e != null){
+			ret += e.data.getDescription().substring(0, 5) + " " + e.data.getTime() + ", ";
+			e = e.next;
+		}
+		return ret;
+	}
 
 
 }
