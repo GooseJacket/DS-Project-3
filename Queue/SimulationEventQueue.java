@@ -31,6 +31,9 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
             data = e;
             next = null;
         }
+        double time(){
+        	return data.getTime();
+		}
     }
 
 
@@ -39,29 +42,43 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
      * @param newEntry An event.
         */
 	public void add(SimulationEvent newEntry){
-	    //version one: add to end
-		if(isEmpty()) {
+		if(isEmpty()) { //if it's the first ever node:
 			startNode = new EventNode(newEntry);
 			numNodes = 1;
-			System.out.println(this.print("DEBUGGING ADD: isE"));
-		}else{
-			double net = newEntry.getTime();
-			if(net >= lastTime) {
-				EventNode added = new EventNode(newEntry);
+			System.out.println(this.print("DEBUGGING ADD: isE."));
+		}
+		else{ //if there are others
+			double net = newEntry.getTime(); //shorthand for newEntry's time
+			if(net >= lastTime) { //if newEntry is a valid event to add:
+				EventNode added = new EventNode(newEntry); //make a node for newEntry
 				EventNode before = null;
 				EventNode after = startNode;
-				while (after != null && net > after.data.getTime()) {
-					before = after;
-					after = after.next;
+
+				if(net < startNode.time()) {//if added should go first, put it first:
+					added.next = startNode;
+					startNode = added;
+					System.out.println(this.print("DEBUGGING ADD: net>lt, net<sn and !isE."));
 				}
-				added.next = after;
-				if(before != null){//avoid NullPointer
-					before.next = added;
+
+				else{//if added should go btw other things:
+					while (after != null && net >= after.time()) {
+						//keep traversing until the next time is bigger OR next node is null
+						before = after;
+						after = after.next;
+					}
+
+					//stick it in the right spot:
+					added.next = after;
+					if (before != null) {//avoid NullPointerE
+						before.next = added;
+					}
+
+					System.out.println(this.print("DEBUGGING ADD: net>lt, net>sn and !isE."));
 				}
 				numNodes++;
-				System.out.println(this.print("DEBUGGING ADD: net>lt and !isE"));
-			}else{
-				System.out.println(this.print("DEBUGGING ADD: net<lt and !isE"));
+
+			}else{ //if not a valid one to add, do nothing
+				System.out.println(this.print("DEBUGGING ADD: net<lt and !isE. Did not add."));
 			}
 		}
     }
@@ -114,6 +131,8 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 	        startNode = n;
 	        numNodes--;
         }
+	    System.out.println(this.print("DEBUGGING CLEAR:"));
+	    System.out.println("numNodes = " + numNodes);
     }
 
 
@@ -129,6 +148,9 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
     private String print(String desc){
 		String ret = desc + " ";
 		EventNode e = startNode;
+		if(e == null){
+			ret += "null";
+		}
 		while(e != null){
 			ret += e.data.getDescription().substring(0, 5) + " " + e.data.getTime() + ", ";
 			e = e.next;
