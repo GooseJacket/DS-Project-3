@@ -75,14 +75,17 @@ public class Teller
     	public void process()
     	{
     	   serving = theLine.dequeue();
-    	   int helpTime = 1;
-    	   if(serving != null){
+    	   //^ had remove() at first! Totally didn't work because the line never shrunk
+    	   int helpTime = 1; //when not dealing with a customer, should check for customers the next second
+    	   if(serving != null){ //if there is a customer, serve them
     	       serve(serving);
     	       postActionReport = "Served customer " + serving.getName();
                helpTime = sharedRandomGenerator.nextInt(maxForHelp);
+               //^ can't check while serving! Set the next check time to after serving this customer
     	   }else{
                postActionReport = "No customer to serve.";
            }
+    	   //add the next checking event to the queue:
             SimulationEvent nextCheck = new Teller.CheckForCustomerEvent(
                     theEventQueue.getCurrentTime() + helpTime,
                     "Help the next customer.");
