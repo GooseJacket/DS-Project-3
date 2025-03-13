@@ -81,6 +81,7 @@ public class BankActionThread extends ActionThread
     public void executeApplication()
     {
         while(!theEvents.isEmpty() && stopSimulationAt > theEvents.getCurrentTime()){
+            //^ forgot to stop at the simulation time at first! maybe shouldn't even have the isEmpty part...
             SimulationEvent se = theEvents.remove();
             se.process();
             lastEventReport = se.getPostActionReport();
@@ -88,7 +89,7 @@ public class BankActionThread extends ActionThread
                 nextEventAction = theEvents.peek().getDescription();
             }
             myReport.updateTime(se.getTime());
-            animationPause();
+            animationPause(); //delay
         }
     }
     
@@ -293,7 +294,7 @@ public class BankActionThread extends ActionThread
                 {
                     setupStatusLabel.setText("Need a positive value for stop ");
                 }
-                
+
             }
         }
         catch(Exception e)
