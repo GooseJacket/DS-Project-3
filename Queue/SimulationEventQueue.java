@@ -1,9 +1,6 @@
 //> Created for the solution
 //Final solution for Lab 6, should be in queue package 
 import QueuePackage.*;
-//to
-//package QueuePackage; 
-
 import java.util.*;
 
 /**
@@ -20,16 +17,12 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
     private double lastTime = 0.0;
 
     private class EventNode{
-        SimulationEvent data;
-        EventNode next;
-
-        EventNode(){
-            data = null;
-            next = null;
-        }
+        SimulationEvent data = null;
+        EventNode next = null;
+        
+        EventNode(){}
         EventNode(SimulationEvent e){
             data = e;
-            next = null;
         }
         double time(){
         	return data.getTime();
@@ -42,46 +35,50 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
      * @param newEntry An event.
         */
 	public void add(SimulationEvent newEntry){
-		if(isEmpty()) { //if it's the first ever node:
-			startNode = new EventNode(newEntry);
-			numNodes = 1;
-			System.out.println(this.print("DEBUGGING ADD: isE."));
-		}
-		else{ //if there are others
-			double net = newEntry.getTime(); //shorthand for newEntry's time
-			if(net >= lastTime) { //if newEntry is a valid event to add:
+		double newEntryTime = newEntry.getTime(); //shorthand for newEntry's time
+		
+		if(newEntryTime >= lastTime) { //if newEntry is a after current time and a valid event to add:
+			
+			if(isEmpty()) { //if it's the first ever node:
+				startNode = new EventNode(newEntry);
+				numNodes = 1;
+				this.print("DEBUGGING ADD: net>lt and isE."); //debugging, usually prints out full list
+			}
+			
+			else { //if there are preexisting nodes:
 				EventNode added = new EventNode(newEntry); //make a node for newEntry
-				EventNode before = null;
-				EventNode after = startNode;
-
-				if(net < startNode.time()) {//if added should go first, put it first:
+				
+				if (newEntryTime < startNode.time()) {//if newEntry should go first, put it first:
 					added.next = startNode;
 					startNode = added;
-					System.out.println(this.print("DEBUGGING ADD: net>lt, net<sn and !isE."));
+					this.print("DEBUGGING ADD: net>lt, net<sn and !isE.");
 				}
 
-				else{//if added should go btw other things:
-					while (after != null && net >= after.time()) {
+				else {//if newEntry should go btw other things:
+					EventNode before = null; //before.next will = newEntry
+					EventNode after = startNode; //newEntry.next will = after
+
+					while (after != null && newEntryTime >= after.time()) {
 						//keep traversing until the next time is bigger OR next node is null
 						before = after;
 						after = after.next;
 					}
-
-					//stick it in the right spot:
+					
+					//stick newEntry in the right spot:
 					added.next = after;
-					if (before != null) {//avoid NullPointerE
+					if (before != null) {//avoid NullPointerException (shouldn't happen...but could)
 						before.next = added;
 					}
-
-					System.out.println(this.print("DEBUGGING ADD: net>lt, net>sn and !isE."));
+					this.print("DEBUGGING ADD: net>lt, net>sn and !isE.");
 				}
-				numNodes++;
 
-			}else{ //if not a valid one to add, do nothing
-				System.out.println(this.print("DEBUGGING ADD: net<lt and !isE. Did not add."));
-			}
+				numNodes++;
+			}//end if(!isEmpty)
 		}
-    }
+		else{ //if not a valid event to add, do nothing
+			this.print("DEBUGGING ADD: net<lt. Did not add.");
+		}
+    } //end add()
 
 	/** Removes and returns the item with the earliest time.
 	 * @return The event with the earliest time or,
@@ -91,9 +88,9 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 		if(isEmpty()){
 			return null;
 		}
-		else {
-			EventNode ret = startNode;
-			lastTime = ret.data.getTime();
+		else { //earliest time item is at start
+			EventNode ret = startNode; 
+			lastTime = ret.data.getTime(); //change time
 			startNode = startNode.next;
 			numNodes--;
 			return ret.data;
@@ -105,36 +102,34 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 	 * if the event queue was empty was empty before the operation, null.
          */
 	public SimulationEvent peek(){
-	    return startNode.data;
+	    return startNode.data; //earliest time is at start
     }
 
 	/** Detects whether this event queue is empty.
 	 * @return True if the event queue is empty.
          */
 	public boolean isEmpty(){
-	    return(startNode == null);
+	    return(startNode == null); //controversial but if it works it works
     }
 
 	/** Gets the size of this event queue.
 	 * @return The number of entries currently in the event queue.
          */
 	public int getSize(){
-	    return numNodes;
+	    return numNodes; //this is why we have numNodes
     }
 
 	/** Removes all entries from this event queue.
          */
 	public void clear(){
-	    while(startNode != null){
+	    while(startNode != null){ //go through and delete each entry
 	        EventNode n = startNode.next;
 	        startNode = null;
 	        startNode = n;
 	        numNodes--;
         }
-	    System.out.println(this.print("DEBUGGING CLEAR:"));
-	    System.out.println("numNodes = " + numNodes);
+	    this.print("DEBUGGING CLEAR (numNodes = " + numNodes +"):");
     }
-
 
 	/**
 	 * The current time of the simulation
@@ -145,7 +140,8 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 	    return lastTime;
     }
 
-    private String print(String desc){
+    //DEBUGGING -- prints out entire list with info on operations 
+    private void print(String desc){
 		String ret = desc + " ";
 		EventNode e = startNode;
 		if(e == null){
@@ -155,13 +151,13 @@ public class SimulationEventQueue implements SimulationEventQueueInterface{
 			ret += e.data.getDescription().substring(0, 5) + " " + e.data.getTime() + ", ";
 			e = e.next;
 		}
-		return ret;
+		//System.out.println(ret);
 	}
 
 
 }
+//PROVIDED VERSION OF SIMULATIONEVENTQUEUE: 
 
-    
 /*public class SimulationEventQueue implements SimulationEventQueueInterface
 {
     private Vector<SimulationEvent> queue;// queue front is first in the vector
